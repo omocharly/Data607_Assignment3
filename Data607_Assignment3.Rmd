@@ -1,0 +1,167 @@
+---
+output: html_document
+toc: True
+toc_float: True
+---
+
+### Title: CUNY SPS MDS Data607_Assignmet3"
+### Author: Charles Ugiagbe
+### Date: "9/12/2021"
+
+##            R Character Manipulation
+
+
+##           Question 1
+
+#1. Using the 173 majors listed in fivethirtyeight.com’s College Majors dataset [https://fivethirtyeight.com/features/the-economic-guide-to-picking-a-college-major/], provide code that identifies the majors that contain either "DATA" or "STATISTICS"
+
+###   Load the required Packages
+```{r}
+library(tidyverse)
+```
+
+### Read file
+This reads the file from github into a tibble (dataframe) and take a glimpse of the data
+```{r}
+url <- "https://raw.githubusercontent.com/omocharly/Data607_Assignment3/main/all-ages.csv"
+college_majors <- read.csv(url)
+head(college_majors)
+```
+
+```{r}
+sub_filter <- dplyr::filter(college_majors, grepl('DATA|STATISTIC', Major))
+sub_filter
+```
+
+```{r}
+sub_col_majors <- sub_filter %>% select(Major_code:Employed)
+sub_col_majors
+```
+
+
+##        Question 2
+
+#2 Write code that transforms the data below:
+
+[1] "bell pepper"  "bilberry"     "blackberry"   "blood orange"
+
+[5] "blueberry"    "cantaloupe"   "chili pepper" "cloudberry"  
+
+[9] "elderberry"   "lime"         "lychee"       "mulberry"    
+
+[13] "olive"        "salal berry"
+
+Into a format like this:
+
+c("bell pepper", "bilberry", "blackberry", "blood orange", "blueberry", "cantaloupe", "chili pepper", "cloudberry", "elderberry", "lime", "lychee", "mulberry", "olive", "salal berry")
+
+##        solution 2
+
+```{r}
+library(stringr)
+```
+
+```{r}
+main_data <- '[1] "bell pepper"  "bilberry"     "blackberry"   "blood orange"
+[5] "blueberry"    "cantaloupe"   "chili pepper" "cloudberry"  
+[9] "elderberry"   "lime"         "lychee"       "mulberry"    
+[13] "olive"        "salal berry"'
+```
+
+## output_string will return a list
+```{r}
+output <- str_extract_all(main_data, pattern = '[a-z]+\\s?[a-z]+')
+output_string <- str_c(output, collapse = ", ")
+```
+
+```{r}
+writeLines(output_string)
+```
+
+
+##        Question 3
+
+#3 Describe, in words, what these expressions will match:
+
+  *(.)\1\1
+  *"(.)(.)\\2\\1"
+  *(..)\1
+  *"(.).\\1.\\1"
+  *"(.)(.)(.).*\\3\\2\\1"
+
+
+##        Solution 3
+
+**(1)**   (.)\1\1
+Matches strings containing any single character except new line followed by ‘\1\1’.
+
+**(2)**   “(.)(.)\2\1”
+Matches strings containing any two characters that are immediately followed by the same two characters in the opposite order. In essence, it matches a 4-character palindrome.
+
+**(3)**   (..)\1
+Matches strings containing any two characters (except new line) followed by ‘\1’.
+
+**(4)**   “(.).\1.\1”
+Matches strings containing any single character (except new line) followed by any character then the matched character followed by any character, then the matched character again.
+
+**(5)**   "(.)(.)(.).*\3\2\1"
+Matches strings containing any three characters in a row in which the three characters are repreated but in the opposite order later in the string.
+
+### See examples to show usage of these strings
+
+
+```{r}
+example_1 <- c('a\1\1', 'b\1\1', 'ccc\1\1c', 'd\1d')
+str_view(example_1, "(.)\1\1")
+```
+
+```{r}
+example_2 <- c('abcccba', 'badmomdad', 'maddam')
+str_view(example_2, "(.)(.)\\2\\1")
+```
+
+```{r}
+example_3 <- c('abc\1d', 'abc\2dd', '\1d')
+str_view(example_3, "(..)\1")
+```
+
+```{r}
+example_04 <- c('philzlyl')
+str_view(example_04, "(.).\\1.\\1")
+```
+
+
+##    Exercise 4 
+
+Construct regular expressions to match words that:
+
+*Start and end with the same character.*
+Contain a repeated pair of letters (e.g. "church" contains "ch" repeated twice.)
+Contain one letter repeated in at least three places (e.g. "eleven" contains three "e"s.)
+
+##    solutios 4
+
+```{r}
+answer.str <- c("CHURCH","ELEVEN","PROP","SEVENTEEN","BANANA" ,"EAGLE")
+```
+
+### Word that start and end with the same character
+
+```{r}
+code1 <- "^(.).*\\1$"
+answer.str %>% str_subset(code1)
+```
+
+### Word that contain a repeated pair of letters
+
+```{r}
+code2 <- "(..).*\\1"
+answer.str %>% str_subset(code2)
+```
+### words that contain one letter in at least 3 places
+
+```{r}
+code3 <- "(.).*\\1.*\\1"
+answer.str %>% str_subset(code3)
+```
+
